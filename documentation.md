@@ -3,889 +3,762 @@ summary: AI Design and deployment lab 5 - Clone Documentation
 feedback link: https://docs.google.com/forms/d/e/1FAIpQLSfWkOK-in_bMMoHSZfcIvAeO58PAH9wrDqcxnJABHaxiDqhSA/viewform?usp=sf_link
 environments: Web
 status: Published
-# Interactive Data Science Dashboard with Streamlit
+# Building Interactive Data Applications with Streamlit
 
-## Introduction to the Interactive Data Science Dashboard
-Duration: 0:05
+## Introduction to Interactive Streamlit Applications
+Duration: 0:05:00
 
-Welcome to this codelab, where you will explore and understand the architecture and functionalities of an Interactive Data Science Dashboard built with Streamlit. This application empowers users to perform exploratory data analysis (EDA) and even build machine learning models with an intuitive, no-code/low-code interface.
+Welcome to this codelab, where you will learn how to build interactive data applications using Streamlit! This codelab focuses on understanding and extending a typical Streamlit application designed for interactive data analysis and visualization.
 
-In today's data-driven world, the ability to quickly visualize data, understand its underlying patterns, and prototype machine learning solutions is crucial. Traditional methods often require deep programming knowledge, creating a barrier for domain experts and non-technical users. This Streamlit application addresses this challenge by providing an interactive web interface that simplifies complex data science workflows.
+Streamlit is an open-source Python library that makes it incredibly easy to create beautiful, custom web applications for machine learning and data science. In a few lines of code, you can build powerful data tools, dashboards, and interactive prototypes without needing front-end development experience.
+
+This application serves as a prime example of Streamlit's capabilities, demonstrating how to:
+*   **Rapidly Prototype**: Quickly turn Python scripts into shareable web apps.
+*   **Engage Users**: Create interactive elements like file uploaders, sliders, and select boxes.
+*   **Visualize Data**: Generate dynamic plots and tables directly within the web interface.
+*   **Explain Complex Concepts**: Present data analysis and even machine learning model insights in an intuitive way.
+
+The core concept behind Streamlit is to treat your Python script as the web application itself. As your script runs from top to bottom, Streamlit re-executes it whenever an input widget changes, automatically updating the UI. This "dataflow" model simplifies development significantly.
+
+### Application's Importance and Concepts
+This application is crucial for anyone looking to build quick data exploration tools, demonstrate ML models, or create internal dashboards without delving into complex web frameworks. It showcases:
+*   **Reactive Programming**: How Streamlit's rerun mechanism simplifies UI updates.
+*   **Component-Based UI**: Using pre-built widgets like `st.sidebar`, `st.file_uploader`, `st.selectbox`, `st.dataframe`, and `st.pyplot`.
+*   **Data Handling with Pandas**: Integrating common data science libraries for robust data manipulation.
+*   **Dynamic Visualization**: Using `matplotlib` or `seaborn` to create plots that respond to user input.
 
 <aside class="positive">
-<b>Streamlit</b> is an open-source Python library that makes it incredibly easy to create custom web apps for machine learning and data science. You can turn data scripts into shareable web apps in minutes, all in pure Python.
+<b>Key Takeaway:</b> Streamlit empowers data scientists and ML engineers to build powerful web applications purely in Python, bridging the gap between data analysis and interactive user interfaces.
 </aside>
-
-### Why is this application important?
-
-*   **Democratization of Data Science:** It makes powerful data analysis and machine learning tools accessible to a broader audience, including business analysts, researchers, and students, without needing extensive coding skills.
-*   **Rapid Prototyping:** Data scientists and developers can quickly prototype ideas, visualize datasets, and test different ML models, accelerating the development lifecycle.
-*   **Interactive Exploration:** Users can dynamically interact with their data, filter, visualize, and configure model parameters, leading to deeper insights.
-*   **Educational Tool:** It serves as an excellent example for understanding the basics of data processing, visualization, and machine learning concepts in a practical, hands-on manner.
-
-### Key Concepts Explained in this Codelab:
-
-*   **Streamlit Fundamentals:** Setting up pages, using widgets (sliders, select boxes, file uploader), managing session state.
-*   **Data Handling with Pandas:** Reading CSVs, displaying dataframes, generating summary statistics, checking for missing values.
-*   **Data Visualization with Matplotlib & Seaborn:** Creating histograms, scatter plots, and box plots dynamically.
-*   **Machine Learning Workflow (Conceptual):** Understanding data preprocessing (missing value imputation, categorical encoding), feature selection, model training, and evaluation.
 
 ### Application Architecture Overview
 
-The application follows a client-server model typical for Streamlit apps. The user interacts with the web interface (client), which sends requests to the Streamlit Python backend (server). The backend processes data using libraries like Pandas, generates visualizations with Matplotlib/Seaborn, and conceptually handles ML model building, then sends updates back to the client.
-
-Here's a high-level architectural diagram:
+The application follows a simple client-server architecture. The Streamlit server runs on your machine (or a cloud instance) and renders the Python script into a web page. Users interact with this web page through their browser.
 
 ```mermaid
 graph TD
-    A[User Browser] --> B(Streamlit Web UI);
-    B --> C{Streamlit Server - Python Application};
-    C --> D[Data Processing - Pandas];
-    C --> E[Data Visualization - Matplotlib/Seaborn];
-    C --> F[ML Model Building - Scikit-learn (Conceptual)];
-    D --> C;
-    E --> C;
-    F --> C;
-    C --> B;
+    A[User Browser] -- HTTP Requests --> B[Streamlit Server]
+    B -- Renders & Executes --> C[Python Script (app.py)]
+    C -- Uses Libraries --> D[Pandas, Matplotlib, Scikit-learn, etc.]
+    D -- Processes Data --> C
+    C -- Generates UI & Data --> B
+    B -- HTTP Responses --> A
 ```
 
-*   **User Browser:** The client-side interface where users interact with the Streamlit application.
-*   **Streamlit Web UI:** Rendered by Streamlit, it provides the interactive widgets and displays.
-*   **Streamlit Server - Python Application:** The core Python script running the Streamlit app. It handles all backend logic.
-*   **Data Processing (Pandas):** Manages data loading, manipulation, and summary statistics.
-*   **Data Visualization (Matplotlib/Seaborn):** Generates plots based on user selections.
-*   **ML Model Building (Scikit-learn - Conceptual):** Placeholder for future implementation of actual ML pipelines.
+**Workflow:**
+1.  The user opens the application in their web browser.
+2.  The browser sends requests to the Streamlit server.
+3.  The Streamlit server executes the `app.py` script.
+4.  The script uses libraries like Pandas for data manipulation, and Matplotlib/Seaborn for visualization.
+5.  Based on user interactions (e.g., file upload, slider change), Streamlit re-executes the script, updating the application state and UI.
+6.  The server sends the updated UI back to the user's browser.
 
 ## Setting Up Your Development Environment
-Duration: 0:05
+Duration: 0:03:00
 
-To run this Streamlit application, you'll need a Python environment configured with the necessary libraries.
+Before we dive into the application code, let's ensure your development environment is properly set up.
 
 ### Prerequisites
 
-*   Python 3.7+ installed on your system.
-*   `pip`, Python's package installer.
+*   Python 3.8+
+*   A code editor (e.g., VS Code, PyCharm)
+*   Command-line interface (CLI) access
 
-### 1. Create a Virtual Environment (Recommended)
+### 1. Install Python
 
-It's a good practice to use a virtual environment to manage dependencies for your projects.
+If you don't have Python installed, download it from [python.org](https://www.python.org/downloads/). Make sure to add Python to your system's PATH during installation.
 
-```console
-python -m venv streamlit_env
-source streamlit_env/bin/activate  # On Linux/macOS
-streamlit_env\Scripts\activate   # On Windows
-```
+### 2. Create a Virtual Environment
 
-### 2. Install Required Libraries
+It's a best practice to use virtual environments to manage dependencies for your projects.
 
-Once your virtual environment is active, install Streamlit and other data science libraries:
+Open your terminal or command prompt and navigate to your desired project directory. Then run:
 
 ```console
-pip install streamlit pandas numpy matplotlib seaborn scikit-learn
+mkdir streamlit_codelab
+cd streamlit_codelab
+python -m venv venv
 ```
 
-### 3. Save the Application Code
+This creates a new virtual environment named `venv` in your project directory.
 
-Create a file named `app.py` (or any other `.py` file) and paste the entire Streamlit application code into it.
+### 3. Activate the Virtual Environment
+
+Activate the virtual environment:
+
+*   **On macOS/Linux:**
+    ```console
+    source venv/bin/activate
+    ```
+*   **On Windows:**
+    ```console
+    venv\Scripts\activate
+    ```
+
+You should see `(venv)` preceding your prompt, indicating that the virtual environment is active.
+
+### 4. Install Dependencies
+
+Now, install Streamlit and other common data science libraries that a typical application like this might use.
+
+```console
+pip install streamlit pandas matplotlib seaborn scikit-learn
+```
+
+<aside class="positive">
+<b>Tip:</b> Always activate your virtual environment before installing dependencies or running your application to ensure project isolation and avoid conflicts.
+</aside>
+
+## Understanding the Streamlit Application Structure
+Duration: 0:10:00
+
+In this step, we'll examine the fundamental structure of a Streamlit application. A typical application is contained within a single Python file, commonly named `app.py` (or `main.py`).
+
+Let's assume our example application, `app.py`, has the following logical flow:
 
 ```python
+# app.py
+
 import streamlit as st
-import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-import os
+from sklearn.preprocessing import StandardScaler
+from sklearn.cluster import KMeans # Example ML component
 
-# Set page config
-st.set_page_config(page_title="Data Science Dashboard", page_icon="📊", layout="wide")
+#  1. Set Page Configuration 
+st.set_page_config(
+    page_title="Interactive Data Explorer",
+    page_icon="📊",
+    layout="wide"
+)
 
-# Custom CSS for styling
-st.markdown("""
-<style>
-.main-header {
-    font-size: 3em;
-    color: #4CAF50;
-    text-align: center;
-    margin-bottom: 30px;
-}
-.subheader {
-    font-size: 2em;
-    color: #2196F3;
-    margin-top: 20px;
-    margin-bottom: 15px;
-}
-.stRadio > label {
-    font-size: 1.2em;
-    font-weight: bold;
-}
-.sidebar .sidebar-content {
-    background-color: #f0f2f6;
-}
-.stButton>button {
-    background-color: #4CAF50;
-    color: white;
-    padding: 10px 20px;
-    border-radius: 5px;
-    border: none;
-}
-</style>
-""", unsafe_allow_html=True)
+#  2. Sidebar for Controls 
+st.sidebar.title("Configuration")
 
-# Initialize session state for data
-if 'df' not in st.session_state:
-    st.session_state['df'] = None
+#  3. Main Content Area 
+st.title("📊 Interactive Data Analysis & Visualization")
+st.write("Upload your CSV file to get started with interactive data exploration.")
 
-# Sidebar Navigation
-st.sidebar.header("Navigation")
-page = st.sidebar.radio("Go to", ["Home", "Data Explorer", "ML Model Builder"])
+#  4. File Uploader 
+uploaded_file = st.file_uploader("Choose a CSV file", type="csv")
 
-if page == "Home":
-    st.markdown("<h1 class='main-header'>Welcome to the Interactive Data Science Dashboard</h1>", unsafe_allow_html=True)
-    st.write("""
-    This interactive dashboard is designed to provide a comprehensive, no-code/low-code platform for data exploration,
-    visualization, and machine learning model building. Whether you're a data scientist, analyst, or researcher,
-    this tool aims to simplify your workflow and help you gain insights faster.
-    """)
-
-    st.image("https://www.streamlit.io/images/brand/streamlit-logo-secondary-colormark-light.png", width=300) # Placeholder for a relevant image
-
-    st.markdown("<h2 class='subheader'>Key Features</h2>", unsafe_allow_html=True)
-    st.write("""
-    *   **Data Explorer:** Upload your CSV files, view raw data, get summary statistics, check for missing values, and create various interactive visualizations (histograms, scatter plots, box plots).
-    *   **ML Model Builder:** (Conceptual) Prepare your data for machine learning, select features, choose from different model types, and train models (functionality to be fully implemented).
-    """)
-
-    st.markdown("<h2 class='subheader'>How It Works</h2>", unsafe_allow_html=True)
-    st.write("""
-    1.  **Upload:** Start by uploading your dataset in the 'Data Explorer' section.
-    2.  **Explore:** Dive deep into your data with interactive tables and statistical summaries.
-    3.  **Visualize:** Generate beautiful charts to uncover patterns and relationships.
-    4.  **Build (Conceptual):** Navigate to the 'ML Model Builder' to preprocess data and train machine learning models.
-    5.  **Analyze:** (Future) Evaluate model performance and interpret results.
-    """)
-    
-    st.info("This dashboard leverages the power of Streamlit for interactive UI, Pandas for data manipulation, and Matplotlib/Seaborn for stunning visualizations.")
-
-
-elif page == "Data Explorer":
-    st.markdown("<h1 class='main-header'>Data Explorer</h1>", unsafe_allow_html=True)
-    st.write("Upload your CSV file here to start exploring your data.")
-
-    uploaded_file = st.file_uploader("Upload your CSV file", type=["csv"])
-
-    if uploaded_file is not None:
-        df = pd.read_csv(uploaded_file)
-        st.session_state['df'] = df
-        st.success("File uploaded successfully!")
-
-        st.markdown("<h2 class='subheader'>Raw Data</h2>", unsafe_allow_html=True)
-        st.dataframe(df)
-
-        st.markdown("<h2 class='subheader'>Summary Statistics</h2>", unsafe_allow_html=True)
-        st.write(df.describe())
-
-        st.markdown("<h2 class='subheader'>Missing Values</h2>", unsafe_allow_html=True)
-        st.write(df.isnull().sum())
-
-        st.markdown("<h2 class='subheader'>Data Visualization</h2>", unsafe_allow_html=True)
-        
-        # Select chart type
-        chart_type = st.selectbox("Select Chart Type", ["Histogram", "Scatter Plot", "Box Plot"])
-
-        plt.figure(figsize=(10, 6)) # Create a new figure for each plot
-
-        if chart_type == "Histogram":
-            column = st.selectbox("Select Column for Histogram", df.columns)
-            if df[column].dtype in ['int64', 'float64']:
-                bins = st.slider("Number of Bins", min_value=5, max_value=50, value=20)
-                plt.hist(df[column], bins=bins, edgecolor='black')
-                plt.title(f'Histogram of {column}')
-                plt.xlabel(column)
-                plt.ylabel('Frequency')
-                st.pyplot(plt)
-            else:
-                st.warning("Please select a numerical column for a Histogram.")
-        
-        elif chart_type == "Scatter Plot":
-            x_column = st.selectbox("Select X-axis Column", df.columns)
-            y_column = st.selectbox("Select Y-axis Column", df.columns)
-            color_column = st.selectbox("Select Color Column (optional)", [None] + list(df.columns))
-
-            if x_column and y_column:
-                if color_column:
-                    sns.scatterplot(x=df[x_column], y=df[y_column], hue=df[color_column])
-                else:
-                    sns.scatterplot(x=df[x_column], y=df[y_column])
-                plt.title(f'Scatter Plot of {x_column} vs {y_column}')
-                plt.xlabel(x_column)
-                plt.ylabel(y_column)
-                st.pyplot(plt)
-            else:
-                st.warning("Please select both X and Y axis columns.")
-
-        elif chart_type == "Box Plot":
-            column = st.selectbox("Select Column for Box Plot", df.columns)
-            if df[column].dtype in ['int64', 'float64']:
-                sns.boxplot(y=df[column])
-                plt.title(f'Box Plot of {column}')
-                plt.ylabel(column)
-                st.pyplot(plt)
-            else:
-                st.warning("Please select a numerical column for a Box Plot.")
-        plt.clf() # Clear the current figure to prevent plots from stacking
-
-    else:
-        st.info("Please upload a CSV file to proceed with data exploration.")
-
-
-elif page == "ML Model Builder":
-    st.markdown("<h1 class='main-header'>ML Model Builder</h1>", unsafe_allow_html=True)
-    st.write("Prepare your data and build machine learning models.")
-
-    if st.session_state['df'] is not None:
-        df = st.session_state['df']
-        st.dataframe(df.head())
-
-        st.markdown("<h2 class='subheader'>Data Preprocessing</h2>", unsafe_allow_html=True)
-        
-        # Missing Value Imputation
-        st.subheader("Handle Missing Values")
-        missing_strategy = st.selectbox("Select Strategy", ["None", "Drop Rows", "Mean Imputation", "Median Imputation", "Mode Imputation"])
-        if missing_strategy != "None":
-            st.info(f"Selected strategy: {missing_strategy}. (Implementation for processing is pending.)")
-
-        # Categorical Encoding
-        st.subheader("Encode Categorical Features")
-        encoding_strategy = st.selectbox("Select Encoding Method", ["None", "One-Hot Encoding", "Label Encoding"])
-        if encoding_strategy != "None":
-            st.info(f"Selected strategy: {encoding_strategy}. (Implementation for processing is pending.)")
-            
-        st.markdown("<h2 class='subheader'>Feature Selection</h2>", unsafe_allow_html=True)
-        all_columns = df.columns.tolist()
-        
-        # Select features (X)
-        features = st.multiselect("Select Features (X)", all_columns, default=all_columns)
-        
-        # Select target variable (y)
-        target = st.selectbox("Select Target Variable (y)", all_columns)
-
-        if not features:
-            st.warning("Please select at least one feature.")
-        elif not target:
-            st.warning("Please select a target variable.")
-        elif target in features:
-            st.warning("Target variable cannot be among features. Please adjust your selection.")
-        else:
-            st.markdown("<h2 class='subheader'>Model Training</h2>", unsafe_allow_html=True)
-            model_type = st.selectbox("Select Model Type", ["Linear Regression", "Logistic Regression", "Decision Tree Classifier", "Random Forest Classifier"])
-            
-            st.subheader("Train/Test Split Configuration")
-            test_size = st.slider("Test Set Size", min_value=0.1, max_value=0.5, value=0.3, step=0.05)
-            random_state = st.number_input("Random State", value=42, min_value=0)
-
-            if st.button("Train Model"):
-                st.info(f"Training {model_type} with features: {features}, target: {target}, test size: {test_size}, random state: {random_state}. (Actual training logic is pending.)")
-                st.success("Model training initiated! (Results will appear here upon implementation.)")
-                
-                # Placeholder for model training and evaluation
-                # from sklearn.model_selection import train_test_split
-                # from sklearn.linear_model import LinearRegression, LogisticRegression
-                # from sklearn.tree import DecisionTreeClassifier
-                # from sklearn.ensemble import RandomForestClassifier
-                # from sklearn.metrics import mean_squared_error, accuracy_score
-                
-                # try:
-                #     X = df[features]
-                #     y = df[target]
-
-                #     # Basic handling of non-numeric data for simplicity in placeholder
-                #     for col in X.columns:
-                #         if X[col].dtype == 'object':
-                #             X[col] = pd.factorize(X[col])[0]
-                #     if y.dtype == 'object':
-                #         y = pd.factorize(y)[0]
-
-                #     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=random_state)
-
-                #     model = None
-                #     if model_type == "Linear Regression":
-                #         model = LinearRegression()
-                #     elif model_type == "Logistic Regression":
-                #         model = LogisticRegression(random_state=random_state)
-                #     elif model_type == "Decision Tree Classifier":
-                #         model = DecisionTreeClassifier(random_state=random_state)
-                #     elif model_type == "Random Forest Classifier":
-                #         model = RandomForestClassifier(random_state=random_state)
-
-                #     if model:
-                #         model.fit(X_train, y_train)
-                #         y_pred = model.predict(X_test)
-
-                #         st.markdown("<h3 class='subheader'>Model Evaluation</h3>", unsafe_allow_html=True)
-                #         if model_type in ["Linear Regression"]:
-                #             mse = mean_squared_error(y_test, y_pred)
-                #             st.write(f"Mean Squared Error: {mse:.2f}")
-                #         else: # Classification models
-                #             accuracy = accuracy_score(y_test, y_pred)
-                #             st.write(f"Accuracy: {accuracy:.2f}")
-                #     else:
-                #         st.error("Model type not recognized or implemented.")
-                # except Exception as e:
-                #     st.error(f"An error occurred during model training: {e}. Please ensure data is numeric or processed.")
-
-    else:
-        st.warning("Please upload a CSV file in the 'Data Explorer' section first to build models.")
-
-```
-
-### 4. Run the Application
-
-Open your terminal, navigate to the directory where you saved `app.py`, and run:
-
-```console
-streamlit run app.py
-```
-
-This command will open the application in your default web browser (usually `http://localhost:8501`).
-
-## Understanding the Application Structure
-Duration: 0:10
-
-The Streamlit application is organized into several key parts, demonstrating best practices for building multi-page dashboards.
-
-### 1. Page Configuration
-
-The `st.set_page_config` function is called at the very beginning to configure the Streamlit page's appearance.
-
-```python
-st.set_page_config(page_title="Data Science Dashboard", page_icon="📊", layout="wide")
-```
-
-*   `page_title`: Sets the title that appears in the browser tab.
-*   `page_icon`: Sets the favicon for the page.
-*   `layout="wide"`: Makes the application use the full width of the browser, which is ideal for data-heavy applications.
-
-### 2. Custom CSS Styling
-
-The application uses `st.markdown` with `unsafe_allow_html=True` to inject custom CSS. This allows for branding and enhancing the visual appeal beyond Streamlit's default styling.
-
-```python
-st.markdown("""
-<style>
-.main-header { /* ... styles ... */ }
-.subheader { /* ... styles ... */ }
-/* ... more styles ... */
-</style>
-""", unsafe_allow_html=True)
-```
-
-This technique is powerful for customizing fonts, colors, spacing, and component appearances.
-
-### 3. Session State Management
-
-`st.session_state` is crucial for maintaining data across reruns and different pages of the Streamlit application. Since Streamlit reruns the script from top to bottom on every user interaction, `st.session_state` provides a way to persist variables.
-
-```python
-if 'df' not in st.session_state:
-    st.session_state['df'] = None
-```
-
-Here, `st.session_state['df']` is initialized to `None` if it doesn't already exist. This variable will store the DataFrame uploaded by the user, making it accessible across the "Data Explorer" and "ML Model Builder" pages.
-
-<aside class="positive">
-Using <b>st.session_state</b> is fundamental for building complex Streamlit applications where data needs to be shared or maintained across different user interactions or pages.
-</aside>
-
-### 4. Sidebar Navigation
-
-The application uses a sidebar for navigation, allowing users to switch between different functionalities.
-
-```python
-st.sidebar.header("Navigation")
-page = st.sidebar.radio("Go to", ["Home", "Data Explorer", "ML Model Builder"])
-```
-
-*   `st.sidebar.header`: Adds a header to the sidebar.
-*   `st.sidebar.radio`: Creates a set of radio buttons in the sidebar. The selected option is stored in the `page` variable, which then dictates which section of the application is rendered.
-
-### 5. Conditional Rendering based on Navigation
-
-The core of the multi-page structure relies on `if/elif` statements that check the value of the `page` variable.
-
-```python
-if page == "Home":
-    # ... Home page content ...
-elif page == "Data Explorer":
-    # ... Data Explorer content ...
-elif page == "ML Model Builder":
-    # ... ML Model Builder content ...
-```
-
-This structure ensures that only the content relevant to the currently selected page is displayed, creating a smooth user experience.
-
-### Application Flowchart
-
-Here's a flowchart visualizing the application's overall navigation and data flow:
-
-```mermaid
-graph TD
-    A[Start Application] --> B{Set Page Config & CSS};
-    B --> C{Initialize Session State (df)};
-    C --> D[Render Sidebar Navigation];
-    D --> E{User Selects Page?};
-    E -- Home --> F[Display Home Page Content];
-    E -- Data Explorer --> G[Display Data Explorer Page];
-    E -- ML Model Builder --> H[Display ML Model Builder Page];
-
-    G --> G1{Upload File?};
-    G1 -- Yes --> G2[Read CSV into DataFrame];
-    G2 --> G3[Store DataFrame in st.session_state['df']];
-    G3 --> G4[Display Raw Data, Summary, Missing Values];
-    G4 --> G5[Render Visualization Widgets];
-    G5 --> G6[Generate & Display Plots];
-
-    H --> H1{Is df in session state?};
-    H1 -- Yes --> H2[Display Data Head];
-    H2 --> H3[Render Preprocessing Widgets];
-    H3 --> H4[Render Feature Selection Widgets];
-    H4 --> H5[Render Model Training Widgets];
-    H5 -- Train Model Clicked --> H6[Conceptual Model Training & Evaluation];
-    H1 -- No --> H7[Display Warning to Upload Data];
-```
-
-## The Home Page - Overview
-Duration: 0:05
-
-The "Home" page serves as an introduction to the application, providing users with an understanding of its purpose, features, and how to get started.
-
-When `page == "Home"`, the following content is displayed:
-
-### 1. Main Title and Introduction
-
-A prominent title welcomes users, followed by a concise description of the dashboard's capabilities.
-
-```python
-st.markdown("<h1 class='main-header'>Welcome to the Interactive Data Science Dashboard</h1>", unsafe_allow_html=True)
-st.write("""
-This interactive dashboard is designed to provide a comprehensive, no-code/low-code platform for data exploration,
-visualization, and machine learning model building. ...
-""")
-```
-The `main-header` class is defined in the custom CSS to give the title a distinct look.
-
-### 2. Placeholder Image
-
-A placeholder image is included to visually enhance the home page. In a real application, this could be a custom logo or an illustrative graphic.
-
-```python
-st.image("https://www.streamlit.io/images/brand/streamlit-logo-secondary-colormark-light.png", width=300) # Placeholder for a relevant image
-```
-
-### 3. Key Features Section
-
-This section outlines the primary functionalities offered by the dashboard, namely "Data Explorer" and "ML Model Builder."
-
-```python
-st.markdown("<h2 class='subheader'>Key Features</h2>", unsafe_allow_html=True)
-st.write("""
-*   **Data Explorer:** Upload your CSV files, view raw data, get summary statistics, ...
-*   **ML Model Builder:** (Conceptual) Prepare your data for machine learning, select features, ...
-""")
-```
-The `subheader` class provides consistent styling for section headings.
-
-### 4. How It Works Section
-
-A step-by-step guide helps users understand the typical workflow within the application. This ensures users can quickly grasp how to navigate and utilize the dashboard.
-
-```python
-st.markdown("<h2 class='subheader'>How It Works</h2>", unsafe_allow_html=True)
-st.write("""
-1.  **Upload:** Start by uploading your dataset in the 'Data Explorer' section.
-2.  **Explore:** Dive deep into your data with interactive tables and statistical summaries.
-3.  **Visualize:** Generate beautiful charts to uncover patterns and relationships.
-4.  **Build (Conceptual):** Navigate to the 'ML Model Builder' to preprocess data and train machine learning models.
-5.  **Analyze:** (Future) Evaluate model performance and interpret results.
-""")
-```
-
-### 5. Informative Note
-
-A small `st.info` box highlights the underlying technologies used, giving users context about the technical stack.
-
-```python
-st.info("This dashboard leverages the power of Streamlit for interactive UI, Pandas for data manipulation, and Matplotlib/Seaborn for stunning visualizations.")
-```
-
-This page serves as an excellent starting point, providing proper context before users dive into the application's core functionalities.
-
-## Data Explorer - Uploading and Viewing Data
-Duration: 0:15
-
-The "Data Explorer" is the first main functional section of the application. It allows users to upload their datasets and get an immediate overview of their data.
-
-When `page == "Data Explorer"`, the application focuses on data input and initial inspection.
-
-### 1. File Upload
-
-The `st.file_uploader` widget is used to allow users to upload their CSV files.
-
-```python
-uploaded_file = st.file_uploader("Upload your CSV file", type=["csv"])
-```
-
-*   `"Upload your CSV file"`: The label displayed to the user.
-*   `type=["csv"]`: Restricts the file upload to CSV files only.
-
-### 2. Reading and Storing Data
-
-If a file is successfully uploaded, it's read into a Pandas DataFrame, and then stored in `st.session_state` for persistence.
-
-```python
 if uploaded_file is not None:
     df = pd.read_csv(uploaded_file)
-    st.session_state['df'] = df
     st.success("File uploaded successfully!")
-```
 
-*   `pd.read_csv(uploaded_file)`: Reads the content of the uploaded file directly into a Pandas DataFrame.
-*   `st.session_state['df'] = df`: Stores the DataFrame in the session state, making it available for other parts of the application without re-uploading.
-*   `st.success("File uploaded successfully!")`: Provides positive feedback to the user.
+    #  5. Data Preview and Basic Statistics 
+    st.subheader("Raw Data Preview")
+    st.dataframe(df.head())
 
-<aside class="negative">
-It's crucial to handle scenarios where `uploaded_file` is `None`. The application correctly places all subsequent data exploration logic inside the `if uploaded_file is not None:` block, ensuring that operations on `df` only happen when data is available.
-</aside>
+    st.subheader("Descriptive Statistics")
+    st.write(df.describe())
 
-### 3. Displaying Raw Data
+    #  6. Data Preprocessing Options (Sidebar) 
+    st.sidebar.subheader("Preprocessing")
+    if st.sidebar.checkbox("Show Missing Values"):
+        st.subheader("Missing Values")
+        st.write(df.isnull().sum())
+    
+    # Example: Handle missing values
+    impute_option = st.sidebar.radio(
+        "Handle Missing Numerical Values:",
+        ("Do nothing", "Mean Imputation", "Median Imputation")
+    )
 
-The `st.dataframe` widget is used to display the entire DataFrame in an interactive table format. Users can sort columns and scroll through the data.
+    if impute_option == "Mean Imputation":
+        for col in df.select_dtypes(include=['number']).columns:
+            df[col].fillna(df[col].mean(), inplace=True)
+        st.sidebar.info("Mean imputation applied.")
+    elif impute_option == "Median Imputation":
+        for col in df.select_dtypes(include=['number']).columns:
+            df[col].fillna(df[col].median(), inplace=True)
+        st.sidebar.info("Median imputation applied.")
+    
+    #  7. Interactive Visualization Options (Sidebar & Main) 
+    st.sidebar.subheader("Visualization Settings")
+    
+    numerical_cols = df.select_dtypes(include=['number']).columns.tolist()
+    if numerical_cols:
+        x_axis = st.sidebar.selectbox("Select X-axis for plot", numerical_cols)
+        y_axis = st.sidebar.selectbox("Select Y-axis for plot", numerical_cols, index=min(1, len(numerical_cols)-1))
+        plot_type = st.sidebar.selectbox("Select Plot Type", ["Histogram", "Scatter Plot"])
 
-```python
-st.markdown("<h2 class='subheader'>Raw Data</h2>", unsafe_allow_html=True)
-st.dataframe(df)
-```
+        st.subheader(f"{plot_type} of {x_axis} vs {y_axis}")
+        fig, ax = plt.subplots()
 
-### 4. Generating Summary Statistics
-
-`df.describe()` is a powerful Pandas function that generates descriptive statistics of the DataFrame's numerical columns.
-
-```python
-st.markdown("<h2 class='subheader'>Summary Statistics</h2>", unsafe_allow_html=True)
-st.write(df.describe())
-```
-
-This output includes count, mean, standard deviation, min/max values, and quartiles, providing a quick statistical overview of the dataset.
-
-### 5. Identifying Missing Values
-
-Understanding missing data is a critical first step in data preprocessing. `df.isnull().sum()` helps identify the number of missing values per column.
-
-```python
-st.markdown("<h2 class='subheader'>Missing Values</h2>", unsafe_allow_html=True)
-st.write(df.isnull().sum())
-```
-
-This output clearly shows which columns have missing entries and how many, guiding subsequent data cleaning steps.
-
-## Data Explorer - Interactive Visualizations
-Duration: 0:20
-
-After uploading and inspecting the data, the "Data Explorer" page provides tools for interactive data visualization using Matplotlib and Seaborn. This section allows users to generate common chart types with customizable parameters.
-
-### 1. Chart Type Selection
-
-A `st.selectbox` widget allows the user to choose the type of visualization they want to create.
-
-```python
-chart_type = st.selectbox("Select Chart Type", ["Histogram", "Scatter Plot", "Box Plot"])
-```
-
-### 2. Plotting Environment Setup
-
-Before plotting, a new Matplotlib figure is created, and `plt.clf()` is used at the end to clear the figure, preventing plots from stacking up on reruns.
-
-```python
-plt.figure(figsize=(10, 6)) # Create a new figure for each plot
-# ... plotting logic ...
-st.pyplot(plt)
-plt.clf() # Clear the current figure to prevent plots from stacking
-```
-
-`st.pyplot(plt)` is the Streamlit function used to render a Matplotlib plot in the application.
-
-### 3. Histogram
-
-Histograms are used to visualize the distribution of a single numerical variable.
-
-```python
-if chart_type == "Histogram":
-    column = st.selectbox("Select Column for Histogram", df.columns)
-    if df[column].dtype in ['int64', 'float64']: # Ensure numerical column
-        bins = st.slider("Number of Bins", min_value=5, max_value=50, value=20)
-        plt.hist(df[column], bins=bins, edgecolor='black')
-        plt.title(f'Histogram of {column}')
-        plt.xlabel(column)
-        plt.ylabel('Frequency')
-        st.pyplot(plt)
+        if plot_type == "Histogram":
+            sns.histplot(df[x_axis], kde=True, ax=ax)
+            ax.set_title(f"Histogram of {x_axis}")
+            ax.set_xlabel(x_axis)
+            ax.set_ylabel("Frequency")
+        elif plot_type == "Scatter Plot":
+            sns.scatterplot(x=df[x_axis], y=df[y_axis], ax=ax)
+            ax.set_title(f"Scatter Plot of {x_axis} vs {y_axis}")
+            ax.set_xlabel(x_axis)
+            ax.set_ylabel(y_axis)
+        
+        st.pyplot(fig)
     else:
-        st.warning("Please select a numerical column for a Histogram.")
-```
+        st.warning("No numerical columns found for visualization.")
 
-*   `st.selectbox`: Allows selecting a column for the histogram.
-*   `st.slider`: Provides an interactive slider to control the number of bins, dynamically changing the granularity of the histogram.
-*   `plt.hist()`: The Matplotlib function to create the histogram.
+    #  8. (Optional) Machine Learning Section 
+    st.sidebar.subheader("Machine Learning")
+    if numerical_cols and st.sidebar.checkbox("Perform K-Means Clustering"):
+        num_clusters = st.sidebar.slider("Number of Clusters (K)", 2, 10, 3)
+        
+        st.subheader(f"K-Means Clustering with K={num_clusters}")
+        
+        # Select only numerical features for clustering
+        X = df[numerical_cols].dropna() # Drop NaNs for clustering
+        
+        if not X.empty:
+            scaler = StandardScaler()
+            X_scaled = scaler.fit_transform(X)
+            
+            kmeans = KMeans(n_clusters=num_clusters, random_state=42, n_init=10)
+            clusters = kmeans.fit_predict(X_scaled)
+            df_clustered = df.loc[X.index].copy() # Align with original DataFrame's index
+            df_clustered['Cluster'] = clusters
+            
+            st.dataframe(df_clustered[['Cluster'] + numerical_cols].head())
 
-### 4. Scatter Plot
-
-Scatter plots are ideal for visualizing the relationship between two numerical variables. An optional third variable can be used for coloring points.
-
-```python
-elif chart_type == "Scatter Plot":
-    x_column = st.selectbox("Select X-axis Column", df.columns)
-    y_column = st.selectbox("Select Y-axis Column", df.columns)
-    color_column = st.selectbox("Select Color Column (optional)", [None] + list(df.columns))
-
-    if x_column and y_column:
-        if color_column:
-            sns.scatterplot(x=df[x_column], y=df[y_column], hue=df[color_column])
+            # Visualize clusters (example with 2 selected features)
+            if len(numerical_cols) >= 2:
+                st.subheader("Cluster Visualization")
+                fig_cluster, ax_cluster = plt.subplots()
+                sns.scatterplot(
+                    x=df_clustered[x_axis],
+                    y=df_clustered[y_axis],
+                    hue=df_clustered['Cluster'],
+                    palette='viridis',
+                    ax=ax_cluster
+                )
+                ax_cluster.set_title(f"Clusters based on {x_axis} and {y_axis}")
+                ax_cluster.set_xlabel(x_axis)
+                ax_cluster.set_ylabel(y_axis)
+                st.pyplot(fig_cluster)
+            else:
+                st.warning("Need at least two numerical columns to visualize clusters.")
         else:
-            sns.scatterplot(x=df[x_column], y=df[y_column])
-        plt.title(f'Scatter Plot of {x_column} vs {y_column}')
-        plt.xlabel(x_column)
-        plt.ylabel(y_column)
-        st.pyplot(plt)
-    else:
-        st.warning("Please select both X and Y axis columns.")
-```
+            st.warning("No data available for clustering after dropping missing values.")
 
-*   `st.selectbox`: Used to select X-axis, Y-axis, and an optional color encoding column.
-*   `sns.scatterplot()`: The Seaborn function for creating scatter plots, offering enhanced aesthetics and easy handling of hue mapping.
-
-### 5. Box Plot
-
-Box plots are useful for visualizing the distribution of a numerical variable and identifying potential outliers, often grouped by a categorical variable (though here it's for a single column).
-
-```python
-elif chart_type == "Box Plot":
-    column = st.selectbox("Select Column for Box Plot", df.columns)
-    if df[column].dtype in ['int64', 'float64']:
-        sns.boxplot(y=df[column])
-        plt.title(f'Box Plot of {column}')
-        plt.ylabel(column)
-        st.pyplot(plt)
-    else:
-        st.warning("Please select a numerical column for a Box Plot.")
-```
-
-*   `st.selectbox`: Allows selecting the numerical column for the box plot.
-*   `sns.boxplot()`: The Seaborn function to generate box plots.
-
-These interactive visualization tools provide users with a dynamic way to gain insights from their data without writing any code.
-
-## ML Model Builder - Data Preprocessing
-Duration: 0:15
-
-The "ML Model Builder" page is designed to guide users through the crucial initial steps of a machine learning workflow: data preprocessing and feature selection. This page conditionally displays its content only if a dataset has been uploaded in the "Data Explorer."
-
-```python
-if st.session_state['df'] is not None:
-    df = st.session_state['df']
-    st.dataframe(df.head()) # Display the head of the DataFrame for context
-    # ... Preprocessing and ML content ...
 else:
-    st.warning("Please upload a CSV file in the 'Data Explorer' section first to build models.")
+    st.info("Please upload a CSV file to proceed.")
+
 ```
 
-This ensures a proper workflow, as ML model building inherently requires data.
+### Key Components Explained:
 
-### 1. Handling Missing Values
+1.  **`st.set_page_config()`**:
+    *   This function allows you to configure global settings for your Streamlit app, such as the page title, icon, and layout (e.g., `wide` for more screen real estate). It should be the first Streamlit command in your script.
 
-Missing data can significantly impact model performance. This section provides options for various imputation strategies.
+2.  **`st.sidebar`**:
+    *   Any Streamlit command prefixed with `st.sidebar.` will render its elements in a collapsible sidebar on the left side of the application. This is ideal for controls, filters, or settings that don't need to be in the main content area.
 
-```python
-st.markdown("<h2 class='subheader'>Data Preprocessing</h2>", unsafe_allow_html=True)
-st.subheader("Handle Missing Values")
-missing_strategy = st.selectbox("Select Strategy", ["None", "Drop Rows", "Mean Imputation", "Median Imputation", "Mode Imputation"])
-if missing_strategy != "None":
-    st.info(f"Selected strategy: {missing_strategy}. (Implementation for processing is pending.)")
-```
+3.  **Main Content Area (`st.title`, `st.write`, etc.)**:
+    *   Commands without the `st.sidebar.` prefix render in the main content area of the application.
+    *   `st.title("...")`: Displays a large, prominent title.
+    *   `st.write("...")`: A versatile function to write text, dataframes, plots, and more.
+    *   `st.subheader("...")`: Displays a smaller subtitle.
 
-*   **Concepts of Missing Value Strategies:**
-    *   **None:** No action is taken.
-    *   **Drop Rows:** Removes all rows containing any missing values. This can lead to significant data loss if many rows have missing data.
-    *   **Mean Imputation:** Replaces missing numerical values with the mean of the column. This is simple but can distort the data's variance.
-    *   **Median Imputation:** Replaces missing numerical values with the median of the column. More robust to outliers than mean imputation.
-    *   **Mode Imputation:** Replaces missing values (numerical or categorical) with the most frequent value (mode) of the column. Useful for categorical data.
+4.  **`st.file_uploader("...", type="csv")`**:
+    *   Provides a widget for users to upload files. The `type` argument restricts allowed file types. When a file is uploaded, this function returns a file-like object.
 
-<aside class="negative">
-The current application provides the UI elements for selecting these strategies but does not implement the actual data transformation logic. This is an excellent area for further development using libraries like Scikit-learn's `SimpleImputer` or Pandas methods (`dropna`, `fillna`).
-</aside>
+5.  **`pd.read_csv(uploaded_file)`**:
+    *   After a file is uploaded, `uploaded_file` can be directly passed to Pandas functions like `read_csv` to load the data into a DataFrame.
 
-### 2. Encoding Categorical Features
+6.  **`st.dataframe(df.head())`**:
+    *   Displays an interactive table of a Pandas DataFrame. Users can sort columns and scroll through the data.
+    *   `df.describe()`: A standard Pandas method to generate descriptive statistics.
 
-Machine learning models typically require numerical input. Categorical features (e.g., "color": "red", "blue", "green") must be converted into numerical representations.
+7.  **`st.checkbox("...")`, `st.radio("...")`**:
+    *   **`st.checkbox`**: A simple boolean toggle. Returns `True` if checked, `False` otherwise.
+    *   **`st.radio`**: Allows users to select one option from a list.
 
-```python
-st.subheader("Encode Categorical Features")
-encoding_strategy = st.selectbox("Select Encoding Method", ["None", "One-Hot Encoding", "Label Encoding"])
-if encoding_strategy != "None":
-    st.info(f"Selected strategy: {encoding_strategy}. (Implementation for processing is pending.)")
-```
+8.  **`st.selectbox("...", options)`**:
+    *   A dropdown menu for selecting a single item from a list. This is very useful for choosing columns for analysis or visualization.
 
-*   **Concepts of Categorical Encoding Strategies:**
-    *   **None:** No action is taken.
-    *   **One-Hot Encoding:** Creates new binary columns for each category in a feature. For example, a "color" column with "red", "blue", "green" would become `color_red`, `color_blue`, `color_green` (each with 0 or 1). This is suitable for nominal (unordered) categorical data.
-    *   **Label Encoding:** Assigns a unique integer to each category. For example, "red" becomes 0, "blue" becomes 1, "green" becomes 2. This implies an ordinal relationship that might not exist, making it less suitable for nominal data but good for ordinal (ordered) data.
+9.  **`matplotlib.pyplot` and `seaborn`**:
+    *   Standard Python libraries for creating plots. Streamlit integrates seamlessly with them.
+    *   `fig, ax = plt.subplots()`: Creates a new Matplotlib figure and an axes object.
+    *   `sns.histplot()`, `sns.scatterplot()`: Examples of using Seaborn for different plot types.
 
-<aside class="negative">
-Similar to missing value handling, the actual implementation for categorical encoding is left for future development. Scikit-learn offers `OneHotEncoder` and `LabelEncoder` for these tasks.
-</aside>
+10. **`st.pyplot(fig)`**:
+    *   Displays a Matplotlib figure within the Streamlit application. Make sure to pass the figure object, not just `plt`.
 
-These preprocessing steps are fundamental for preparing raw data for machine learning models, ensuring they can effectively learn from the features.
+11. **Machine Learning Integration (e.g., `KMeans`, `StandardScaler`)**:
+    *   Streamlit doesn't directly provide ML models, but you can seamlessly integrate any Python ML library (like Scikit-learn, TensorFlow, PyTorch).
+    *   User inputs (e.g., `st.slider`) can dynamically control ML model parameters.
+    *   Model outputs (predictions, clusters) can be displayed using `st.dataframe` or visualized with `st.pyplot`.
 
-## ML Model Builder - Feature Selection and Model Training
-Duration: 0:20
+This structured approach allows you to build complex applications by breaking them down into manageable, interactive components.
 
-Once the data preprocessing steps are conceptually defined, the next stage in the "ML Model Builder" is to select the features and target variable, and then configure the machine learning model training process.
+## Running the Streamlit Application
+Duration: 0:02:00
 
-### 1. Feature Selection
+Now that we understand the structure, let's run the application and see it in action.
 
-This section allows users to define their independent variables (features, X) and dependent variable (target, y).
+### 1. Save the Code
 
-```python
-st.markdown("<h2 class='subheader'>Feature Selection</h2>", unsafe_allow_html=True)
-all_columns = df.columns.tolist()
+Save the code from the previous step into a file named `app.py` in your `streamlit_codelab` directory.
 
-# Select features (X)
-features = st.multiselect("Select Features (X)", all_columns, default=all_columns)
+### 2. Run the Application
 
-# Select target variable (y)
-target = st.selectbox("Select Target Variable (y)", all_columns)
-
-if not features:
-    st.warning("Please select at least one feature.")
-elif not target:
-    st.warning("Please select a target variable.")
-elif target in features:
-    st.warning("Target variable cannot be among features. Please adjust your selection.")
-else:
-    # Proceed to model training if selections are valid
-    # ... model training logic ...
-```
-
-*   `st.multiselect("Select Features (X)", all_columns, default=all_columns)`: Allows users to select multiple columns that will serve as input features for the model. `default=all_columns` pre-selects all columns, which can be convenient for users.
-*   `st.selectbox("Select Target Variable (y)", all_columns)`: Allows users to select a single column as the target variable that the model will try to predict.
-*   **Validation:** Basic checks ensure that features are selected, a target is selected, and the target is not also included in the features.
-
-### 2. Model Training Configuration
-
-This part enables users to choose a model type and configure the train-test split parameters.
-
-```python
-st.markdown("<h2 class='subheader'>Model Training</h2>", unsafe_allow_html=True)
-model_type = st.selectbox("Select Model Type", ["Linear Regression", "Logistic Regression", "Decision Tree Classifier", "Random Forest Classifier"])
-
-st.subheader("Train/Test Split Configuration")
-test_size = st.slider("Test Set Size", min_value=0.1, max_value=0.5, value=0.3, step=0.05)
-random_state = st.number_input("Random State", value=42, min_value=0)
-
-if st.button("Train Model"):
-    st.info(f"Training {model_type} with features: {features}, target: {target}, test size: {test_size}, random state: {random_state}. (Actual training logic is pending.)")
-    st.success("Model training initiated! (Results will appear here upon implementation.)")
-    # Placeholder for actual model training and evaluation
-```
-
-*   `st.selectbox("Select Model Type", ...)`: Offers a selection of common regression and classification models.
-    *   **Linear Regression:** A statistical method for modeling the relationship between a scalar dependent variable and one or more independent variables by fitting a linear equation to observed data. Suitable for continuous target variables.
-    *   **Logistic Regression:** Despite its name, it's a classification algorithm used to estimate the probability of a binary outcome. It can be extended for multi-class classification. Suitable for categorical target variables.
-    *   **Decision Tree Classifier:** A non-parametric supervised learning method used for classification and regression. It works by creating a tree-like model of decisions.
-    *   **Random Forest Classifier:** An ensemble learning method that operates by constructing a multitude of decision trees at training time and outputting the class that is the mode of the classes (classification) or mean prediction (regression) of the individual trees. Generally robust and accurate.
-*   `test_size = st.slider(...)`: Determines the proportion of the dataset to be used for testing the model's performance. A common value is 0.2 or 0.3.
-*   `random_state = st.number_input(...)`: Used for reproducibility. Setting a `random_state` ensures that the train-test split and any random processes within the model (like in Random Forest) yield the same results every time the script is run with the same inputs.
-*   `st.button("Train Model")`: Triggers the conceptual model training process.
-
-### Conceptual ML Pipeline Flowchart
-
-This diagram illustrates the intended flow of data through the machine learning pipeline within the application:
-
-```mermaid
-graph TD
-    A[Raw Data (from Data Explorer)] --> B{Data Preprocessing};
-    B --> B1[Handle Missing Values];
-    B --> B2[Encode Categorical Features];
-    B1 --> C;
-    B2 --> C;
-    C[Cleaned & Transformed Data] --> D{Feature Selection};
-    D --> D1[Select Features (X)];
-    D --> D2[Select Target (y)];
-    D1 --> E;
-    D2 --> E;
-    E[Features (X) & Target (y)] --> F{Train/Test Split};
-    F --> F1[Training Set (X_train, y_train)];
-    F --> F2[Test Set (X_test, y_test)];
-    F1 --> G[Model Training];
-    G --> G1[Selected ML Model];
-    G1 --> H[Trained Model];
-    F2 --> H;
-    H --> I[Model Evaluation (Conceptual)];
-    I --> J[Performance Metrics & Results];
-```
-
-<aside class="positive">
-Implementing the actual model training and evaluation logic (commented out in the provided code) would involve using Scikit-learn. This includes `train_test_split`, model instantiation (e.g., `LinearRegression()`, `RandomForestClassifier()`), `model.fit()`, `model.predict()`, and metrics like `mean_squared_error` or `accuracy_score`.
-</aside>
-
-This section lays the groundwork for a powerful, interactive ML model building experience, even though the full backend implementation is a placeholder for demonstration and future expansion.
-
-## Running the Application and Further Enhancements
-Duration: 0:05
-
-You've now explored the complete structure and conceptual functionalities of the Streamlit Interactive Data Science Dashboard.
-
-### Running Your Application
-
-To run the application, open your terminal, navigate to the directory where you saved `app.py`, and execute:
+With your virtual environment activated, navigate to the `streamlit_codelab` directory in your terminal and run:
 
 ```console
 streamlit run app.py
 ```
 
-This will launch the application in your web browser. Try uploading a CSV file (you can find many sample datasets online, e.g., from Kaggle or UCI Machine Learning Repository) and experiment with the data explorer and the ML model builder pages.
+Streamlit will launch a local server and open the application in your default web browser. You'll typically see output like this:
 
-### Potential Further Enhancements
+```console
+  You can now view your Streamlit app in your browser.
 
-The provided application serves as a strong foundation. Here are several ways you can expand its capabilities:
+  Local URL: http://localhost:8501
+  Network URL: http://192.168.1.XX:8501
 
-1.  **Implement Data Preprocessing:**
-    *   Add actual logic for "Drop Rows", "Mean/Median/Mode Imputation" using `df.dropna()`, `df.fillna()`, `SimpleImputer` from `sklearn.impute`.
-    *   Implement "One-Hot Encoding" using `pd.get_dummies()` or `OneHotEncoder` from `sklearn.preprocessing`.
-    *   Implement "Label Encoding" using `LabelEncoder` from `sklearn.preprocessing`.
-    *   Consider adding data scaling (StandardScaler, MinMaxScaler) for numerical features.
+```
 
-2.  **Complete ML Model Training and Evaluation:**
-    *   Uncomment and implement the Scikit-learn code for `train_test_split`, model instantiation, `model.fit()`, and `model.predict()`.
-    *   Display relevant evaluation metrics based on the model type (e.g., `accuracy_score`, `precision_score`, `recall_score`, `f1_score` for classification; `mean_squared_error`, `r2_score` for regression).
-    *   Visualize model results (e.g., confusion matrix for classification, residual plots for regression).
-    *   Add hyperparameter tuning options for models.
+### 3. Interact with the App
 
-3.  **Add More Visualization Types:**
-    *   Correlation Heatmaps (`sns.heatmap`).
-    *   Pair Plots (`sns.pairplot`).
-    *   Count Plots (`sns.countplot`) for categorical distributions.
-    *   Interactive plots using libraries like Plotly or Altair for more dynamic exploration.
+*   **Upload a CSV:** The app starts by prompting you to upload a CSV file. You can use any public dataset (e.g., Iris, Titanic, or a simple CSV you create yourself).
+    <button>
+      [Download Sample CSV (Iris)](https://raw.githubusercontent.com/mwaskom/seaborn-data/master/iris.csv)
+    </button>
+*   **Explore Data:** After uploading, observe the raw data preview and descriptive statistics.
+*   **Use Sidebar Controls:**
+    *   Click the "Show Missing Values" checkbox.
+    *   Select different "Handle Missing Numerical Values" options.
+    *   Change the X-axis, Y-axis, and Plot Type for visualizations.
+    *   Toggle "Perform K-Means Clustering" and adjust the "Number of Clusters (K)" slider.
+*   **Observe Reactivity:** Notice how the application reloads and updates its content dynamically as you interact with the widgets.
 
-4.  **Error Handling and Robustness:**
-    *   Implement more robust error handling for data types, missing values, and potential issues during model training.
-    *   Guide users better when they select incompatible column types for certain visualizations.
+<aside class="negative">
+If you encounter any errors, check your terminal for traceback messages. Common issues include missing libraries (ensure `pip install` was successful) or syntax errors in `app.py`.
+</aside>
 
-5.  **Data Persistence for Models:**
-    *   Allow users to save trained models (`joblib` or `pickle`) and load them for making predictions on new data.
+## Data Upload and Initial Exploration
+Duration: 0:08:00
 
-6.  **Deployment:**
-    *   Learn how to deploy your Streamlit application to platforms like Streamlit Community Cloud, Heroku, or AWS.
+The first key functionality of our application is allowing users to upload their own data and get an immediate overview. This step focuses on how Streamlit handles file uploads and displays initial data insights.
 
-### Conclusion
+### 1. File Uploader (`st.file_uploader`)
 
-This codelab has walked you through building a powerful and interactive data science dashboard using Streamlit. You've learned how to structure a multi-page application, handle user input, manage session state, perform basic data exploration, create dynamic visualizations, and lay the groundwork for a machine learning pipeline.
+The `st.file_uploader` widget is crucial for applications that process user-provided data.
 
-By leveraging Streamlit's simplicity and the vast ecosystem of Python data science libraries, you can create compelling and useful tools that democratize access to complex analytical capabilities. We encourage you to continue experimenting and enhancing this application with your own ideas!
+```python
+# app.py snippet
+# ...
+uploaded_file = st.file_uploader("Choose a CSV file", type="csv")
+
+if uploaded_file is not None:
+    # Code to process the file goes here
+    df = pd.read_csv(uploaded_file)
+    st.success("File uploaded successfully!")
+    # ... rest of the app logic
+else:
+    st.info("Please upload a CSV file to proceed.")
+```
+
+*   **`st.file_uploader("Choose a CSV file", type="csv")`**: This line creates the upload button.
+    *   The first argument is the label displayed to the user.
+    *   `type="csv"` restricts the uploaded files to CSV format. You can specify multiple types, e.g., `type=["csv", "xlsx", "json"]`.
+*   **`if uploaded_file is not None:`**: This condition is essential. `st.file_uploader` returns `None` if no file has been uploaded yet. Once a file is uploaded, it returns a `UploadedFile` object.
+*   **`pd.read_csv(uploaded_file)`**: The `UploadedFile` object is directly compatible with Pandas functions like `pd.read_csv`, making it straightforward to load data.
+
+### 2. Displaying Raw Data (`st.dataframe`)
+
+After the data is loaded, it's good practice to show a preview to the user.
+
+```python
+# app.py snippet
+# ...
+    st.subheader("Raw Data Preview")
+    st.dataframe(df.head())
+```
+
+*   **`st.dataframe(df.head())`**: This displays the first few rows of the DataFrame in an interactive table. Users can sort columns and scroll horizontally if the DataFrame is wide.
+    *   You can also use `st.table(df)` for a static table, which is useful for smaller datasets where interactivity is not required.
+
+### 3. Displaying Descriptive Statistics (`df.describe()`)
+
+Providing basic statistical summaries gives users a quick understanding of their data's distribution and characteristics.
+
+```python
+# app.py snippet
+# ...
+    st.subheader("Descriptive Statistics")
+    st.write(df.describe())
+```
+
+*   **`df.describe()`**: This Pandas method generates a summary of numerical columns, including count, mean, standard deviation, min, max, and quartiles.
+*   **`st.write(df.describe())`**: `st.write()` is a versatile function that can display almost anything, including DataFrames, strings, numbers, and plots. When passed a DataFrame, it renders it as a static table.
+
+<aside class="positive">
+<b>Best Practice:</b> Always provide immediate feedback to the user after a significant action, like a file upload. `st.success()` or `st.info()` are great for this.
+</aside>
+
+### Exercise: Extend Initial Exploration
+
+Modify `app.py` to also display the shape of the DataFrame (number of rows and columns) and the data types of each column using `df.shape` and `df.dtypes`.
+
+```python
+# Inside the if uploaded_file is not None: block
+
+# ... existing code for st.dataframe(df.head()) and st.write(df.describe()) ...
+
+    st.subheader("Data Info")
+    st.write(f"DataFrame Shape: {df.shape[0]} rows, {df.shape[1]} columns")
+    st.write("Column Data Types:")
+    st.write(df.dtypes)
+```
+
+Run the app again (`streamlit run app.py`), upload your CSV, and observe the new information.
+
+## Data Preprocessing and Cleaning
+Duration: 0:12:00
+
+Real-world datasets often require preprocessing steps like handling missing values or feature scaling. This section covers how to provide interactive controls for these operations.
+
+### 1. Showing Missing Values (`st.checkbox`)
+
+Letting users inspect missing values is a crucial first step in data cleaning.
+
+```python
+# app.py snippet (inside the if uploaded_file is not None: block)
+# ...
+    st.sidebar.subheader("Preprocessing")
+    if st.sidebar.checkbox("Show Missing Values"):
+        st.subheader("Missing Values")
+        st.write(df.isnull().sum())
+```
+
+*   **`st.sidebar.checkbox("Show Missing Values")`**: This creates a checkbox in the sidebar. When checked, the condition becomes `True`, and the code inside the `if` block executes, displaying the sum of null values for each column using `df.isnull().sum()`.
+
+### 2. Handling Missing Numerical Values (`st.radio`)
+
+Providing options for imputation allows users to decide how to deal with numerical missing data.
+
+```python
+# app.py snippet
+# ...
+    impute_option = st.sidebar.radio(
+        "Handle Missing Numerical Values:",
+        ("Do nothing", "Mean Imputation", "Median Imputation")
+    )
+
+    if impute_option == "Mean Imputation":
+        for col in df.select_dtypes(include=['number']).columns:
+            df[col].fillna(df[col].mean(), inplace=True)
+        st.sidebar.info("Mean imputation applied.")
+    elif impute_option == "Median Imputation":
+        for col in df.select_dtypes(include=['number']).columns:
+            df[col].fillna(df[col].median(), inplace=True)
+        st.sidebar.info("Median imputation applied.")
+```
+
+*   **`st.sidebar.radio("...", ("Do nothing", "Mean Imputation", "Median Imputation"))`**: This widget creates radio buttons. The user can select one of the provided options. The selected option's string value is stored in `impute_option`.
+*   **Conditional Logic**: Based on the `impute_option`, the code applies either mean or median imputation to all numerical columns in the DataFrame using Pandas' `fillna()` method.
+*   **`st.sidebar.info("...")`**: Displays an informative message in the sidebar, confirming the action taken.
+
+<aside class="negative">
+<b>Warning:</b> Modifying the DataFrame `df` in place (e.g., `df.fillna(..., inplace=True)`) means subsequent operations will use the modified data. Be mindful of the order of operations and potential side effects if you need the original data later. For complex workflows, consider creating copies of the DataFrame (`df.copy()`).
+</aside>
+
+### 3. Flowchart for Preprocessing
+
+Here's a simple flowchart illustrating the preprocessing flow:
+
+```mermaid
+graph TD
+    A[Start Preprocessing] --> B{Show Missing Values?};
+    B -- Yes --> C[Display df.isnull().sum()];
+    B -- No --> D[Select Imputation Option];
+    C --> D;
+    D --> E{Option Selected};
+    E -- Mean Imputation --> F[Apply Mean Imputation];
+    E -- Median Imputation --> G[Apply Median Imputation];
+    E -- Do nothing --> H[No Imputation];
+    F --> I[End Preprocessing];
+    G --> I;
+    H --> I;
+```
+
+This visual representation helps understand how user choices drive different preprocessing paths within the application.
+
+## Interactive Data Visualization
+Duration: 0:15:00
+
+Visualization is key to understanding data. Streamlit makes it easy to create dynamic plots that respond to user selections. This section demonstrates how to build interactive charts using `matplotlib` and `seaborn`.
+
+### 1. Selecting Columns for Visualization (`st.selectbox`)
+
+Users need to choose which features they want to plot. `st.selectbox` is perfect for this.
+
+```python
+# app.py snippet (inside the if uploaded_file is not None: block)
+# ...
+    st.sidebar.subheader("Visualization Settings")
+    
+    numerical_cols = df.select_dtypes(include=['number']).columns.tolist()
+    if numerical_cols:
+        x_axis = st.sidebar.selectbox("Select X-axis for plot", numerical_cols)
+        y_axis = st.sidebar.selectbox("Select Y-axis for plot", numerical_cols, index=min(1, len(numerical_cols)-1))
+        plot_type = st.sidebar.selectbox("Select Plot Type", ["Histogram", "Scatter Plot"])
+
+        # ... plot generation code below ...
+    else:
+        st.warning("No numerical columns found for visualization.")
+```
+
+*   **`numerical_cols = df.select_dtypes(include=['number']).columns.tolist()`**: We first identify all numerical columns. This ensures that the user can only select appropriate columns for these types of plots.
+*   **`st.sidebar.selectbox("Select X-axis for plot", numerical_cols)`**: Creates a dropdown in the sidebar allowing the user to pick an X-axis column from the list of `numerical_cols`.
+*   **`index=min(1, len(numerical_cols)-1)`**: This sets the default selected item for the Y-axis. It tries to select the second column if available, otherwise the first.
+*   **`plot_type = st.sidebar.selectbox("Select Plot Type", ["Histogram", "Scatter Plot"])`**: Allows the user to choose between different visualization types.
+
+### 2. Generating Plots (`matplotlib` & `seaborn`)
+
+Once column and plot types are selected, we generate the actual charts.
+
+```python
+# app.py snippet (continued from above)
+# ...
+        st.subheader(f"{plot_type} of {x_axis} vs {y_axis}")
+        fig, ax = plt.subplots() # Create a Matplotlib figure and axes
+
+        if plot_type == "Histogram":
+            sns.histplot(df[x_axis], kde=True, ax=ax)
+            ax.set_title(f"Histogram of {x_axis}")
+            ax.set_xlabel(x_axis)
+            ax.set_ylabel("Frequency")
+        elif plot_type == "Scatter Plot":
+            sns.scatterplot(x=df[x_axis], y=df[y_axis], ax=ax)
+            ax.set_title(f"Scatter Plot of {x_axis} vs {y_axis}")
+            ax.set_xlabel(x_axis)
+            ax.set_ylabel(y_axis)
+        
+        st.pyplot(fig) # Display the Matplotlib figure
+```
+
+*   **`fig, ax = plt.subplots()`**: It's crucial to explicitly create a Matplotlib figure and axes object. Streamlit will capture and display whatever is on the *current* Matplotlib figure.
+*   **`sns.histplot(...)` / `sns.scatterplot(...)`**: These Seaborn functions are used to draw the plots. We pass the DataFrame columns (`df[x_axis]`, `df[y_axis]`) and the `ax=ax` argument to ensure the plot is drawn on our specific axes.
+*   **`ax.set_title()`, `ax.set_xlabel()`, `ax.set_ylabel()`**: Standard Matplotlib methods to customize plot titles and labels.
+*   **`st.pyplot(fig)`**: This is the Streamlit command that takes the generated `fig` object and renders it as an image in the web application.
+
+<aside class="positive">
+<b>Tip:</b> Always call `plt.subplots()` to ensure Streamlit correctly displays a new plot each time the script reruns. If you don't explicitly create a figure, Matplotlib might reuse an old figure, leading to unexpected results.
+</aside>
+
+### Exercise: Add a Box Plot Option
+
+Extend the `plot_type` selection to include a "Box Plot" option. A box plot is useful for visualizing the distribution of a single numerical variable.
+
+1.  Modify the `plot_type` `st.selectbox` to include `"Box Plot"`.
+2.  Add an `elif` condition to handle the `"Box Plot"` choice. For a box plot, you typically only need one numerical variable (e.g., `x_axis`).
+
+```python
+# app.py snippet (modify existing code)
+# ...
+        plot_type = st.sidebar.selectbox("Select Plot Type", ["Histogram", "Scatter Plot", "Box Plot"])
+
+        st.subheader(f"{plot_type} of {x_axis}" + (f" vs {y_axis}" if plot_type == "Scatter Plot" else ""))
+        fig, ax = plt.subplots()
+
+        if plot_type == "Histogram":
+            sns.histplot(df[x_axis], kde=True, ax=ax)
+            ax.set_title(f"Histogram of {x_axis}")
+            ax.set_xlabel(x_axis)
+            ax.set_ylabel("Frequency")
+        elif plot_type == "Scatter Plot":
+            sns.scatterplot(x=df[x_axis], y=df[y_axis], ax=ax)
+            ax.set_title(f"Scatter Plot of {x_axis} vs {y_axis}")
+            ax.set_xlabel(x_axis)
+            ax.set_ylabel(y_axis)
+        elif plot_type == "Box Plot": # New condition
+            sns.boxplot(y=df[x_axis], ax=ax) # Box plot typically uses one variable on an axis
+            ax.set_title(f"Box Plot of {x_axis}")
+            ax.set_ylabel(x_axis)
+        
+        st.pyplot(fig)
+# ...
+```
+
+Run the app again, upload your data, and try out the new "Box Plot" option.
+
+## Integrating a Machine Learning Model (K-Means Clustering)
+Duration: 0:15:00
+
+Streamlit is not just for data exploration; it's also excellent for demonstrating machine learning models. This section shows how to integrate a simple K-Means clustering algorithm, allowing users to interactively explore clusters in their data.
+
+### 1. Enabling Clustering (`st.checkbox` and `st.slider`)
+
+Users should have control over whether to run the clustering and with how many clusters.
+
+```python
+# app.py snippet (inside the if uploaded_file is not None: block)
+# ...
+    st.sidebar.subheader("Machine Learning")
+    if numerical_cols and st.sidebar.checkbox("Perform K-Means Clustering"):
+        num_clusters = st.sidebar.slider("Number of Clusters (K)", 2, 10, 3)
+        
+        # ... clustering logic below ...
+```
+
+*   **`st.sidebar.checkbox("Perform K-Means Clustering")`**: A checkbox to toggle the clustering functionality. It's conditionally enabled only if `numerical_cols` are present.
+*   **`st.sidebar.slider("Number of Clusters (K)", 2, 10, 3)`**: A slider widget that allows the user to select an integer value within a range (2 to 10 in this case), with a default value of 3. This directly controls the `k` parameter for K-Means.
+
+### 2. Performing K-Means Clustering
+
+The core ML logic involves scaling the data and applying the K-Means algorithm.
+
+```python
+# app.py snippet (continued from above)
+# ...
+        st.subheader(f"K-Means Clustering with K={num_clusters}")
+        
+        # Select only numerical features for clustering and drop any remaining NaNs
+        X = df[numerical_cols].dropna() 
+        
+        if not X.empty:
+            # Scale the data before clustering
+            scaler = StandardScaler()
+            X_scaled = scaler.fit_transform(X)
+            
+            # Apply K-Means
+            kmeans = KMeans(n_clusters=num_clusters, random_state=42, n_init=10)
+            clusters = kmeans.fit_predict(X_scaled)
+            
+            # Add cluster labels back to a copy of the original DataFrame
+            df_clustered = df.loc[X.index].copy() 
+            df_clustered['Cluster'] = clusters
+            
+            st.dataframe(df_clustered[['Cluster'] + numerical_cols].head())
+
+            # ... cluster visualization below ...
+        else:
+            st.warning("No data available for clustering after dropping missing values.")
+```
+
+*   **`X = df[numerical_cols].dropna()`**: It's crucial to select only numerical features for K-Means and handle any remaining missing values (here, by dropping rows with NaNs) as K-Means cannot handle them.
+*   **`scaler = StandardScaler()` & `X_scaled = scaler.fit_transform(X)`**: Standard scaling is performed on the data. This is a common preprocessing step for many ML algorithms, especially distance-based ones like K-Means, to ensure all features contribute equally.
+*   **`kmeans = KMeans(n_clusters=num_clusters, random_state=42, n_init=10)`**: Initializes the K-Means model with the user-selected number of clusters. `random_state` ensures reproducibility. `n_init` explicitly sets the number of times the k-means algorithm is run with different centroid seeds.
+*   **`clusters = kmeans.fit_predict(X_scaled)`**: Fits the K-Means model to the scaled data and predicts the cluster for each data point.
+*   **`df_clustered = df.loc[X.index].copy()` & `df_clustered['Cluster'] = clusters`**: The cluster labels are added as a new column to a DataFrame that is aligned with the data used for clustering.
+
+### 3. Visualizing Clusters
+
+Displaying the clusters visually helps users interpret the results.
+
+```python
+# app.py snippet (continued from above)
+# ...
+            # Visualize clusters (example with 2 selected features)
+            if len(numerical_cols) >= 2:
+                st.subheader("Cluster Visualization")
+                fig_cluster, ax_cluster = plt.subplots()
+                sns.scatterplot(
+                    x=df_clustered[x_axis],
+                    y=df_clustered[y_axis],
+                    hue=df_clustered['Cluster'], # Color points by cluster
+                    palette='viridis',
+                    ax=ax_cluster
+                )
+                ax_cluster.set_title(f"Clusters based on {x_axis} and {y_axis}")
+                ax_cluster.set_xlabel(x_axis)
+                ax_cluster.set_ylabel(y_axis)
+                st.pyplot(fig_cluster)
+            else:
+                st.warning("Need at least two numerical columns to visualize clusters.")
+# ...
+```
+
+*   **`sns.scatterplot(..., hue=df_clustered['Cluster'], palette='viridis', ax=ax_cluster)`**: A scatter plot is used to visualize the clusters. The `hue` argument is crucial here; it tells Seaborn to color the points based on their `Cluster` label, making the clusters visually distinct. `palette='viridis'` provides a colormap.
+
+<aside class="positive">
+<b>Tip:</b> For more complex ML models, you could consider caching (`@st.cache_data` or `@st.cache_resource`) the model loading or training steps to improve performance, especially if they are computationally expensive and inputs don't change frequently.
+</aside>
+
+### Exercise: Add Inertia Plot for Elbow Method
+
+The Elbow Method helps determine an optimal number of clusters. Add a feature to plot the inertia for a range of K values.
+
+1.  Add a new checkbox in the sidebar: "Show Elbow Method".
+2.  If checked, calculate and plot the inertia for K from 2 to 10 (or a similar range).
+
+```python
+# app.py snippet (within the ML section)
+# ...
+        if numerical_cols and st.sidebar.checkbox("Perform K-Means Clustering"):
+            num_clusters = st.sidebar.slider("Number of Clusters (K)", 2, 10, 3)
+            # ... existing clustering and visualization code ...
+
+        if numerical_cols and st.sidebar.checkbox("Show Elbow Method"):
+            st.subheader("Elbow Method for Optimal K")
+            X_elbow = df[numerical_cols].dropna()
+            
+            if not X_elbow.empty:
+                scaler_elbow = StandardScaler()
+                X_scaled_elbow = scaler_elbow.fit_transform(X_elbow)
+                
+                inertias = []
+                k_range = range(1, 11) # Test K from 1 to 10
+                for k in k_range:
+                    kmeans_elbow = KMeans(n_clusters=k, random_state=42, n_init=10)
+                    kmeans_elbow.fit(X_scaled_elbow)
+                    inertias.append(kmeans_elbow.inertia_)
+                
+                fig_elbow, ax_elbow = plt.subplots()
+                ax_elbow.plot(k_range, inertias, marker='o')
+                ax_elbow.set_title("Elbow Method")
+                ax_elbow.set_xlabel("Number of Clusters (K)")
+                ax_elbow.set_ylabel("Inertia")
+                ax_elbow.grid(True)
+                st.pyplot(fig_elbow)
+            else:
+                st.warning("No data for Elbow Method after dropping missing values.")
+```
+
+Run the app, upload data, and explore the Elbow Method to see how inertia changes with the number of clusters.
+
+## Conclusion and Next Steps
+Duration: 0:03:00
+
+Congratulations! You've successfully navigated through a comprehensive Streamlit codelab, understanding the core functionalities of an interactive data analysis and visualization application.
+
+### What You've Learned
+
+*   **Streamlit Fundamentals**: How to structure a Streamlit application, use various widgets (`st.sidebar`, `st.file_uploader`, `st.selectbox`, `st.slider`, `st.checkbox`, `st.radio`), and display content (`st.title`, `st.write`, `st.dataframe`, `st.pyplot`).
+*   **Interactive Data Handling**: How to allow users to upload CSV files, preview data, and perform basic data exploration.
+*   **Dynamic Preprocessing**: Implementing interactive controls for data cleaning steps like handling missing values.
+*   **Responsive Visualization**: Generating and displaying various plots (`matplotlib`, `seaborn`) that update based on user selections.
+*   **Machine Learning Integration**: Incorporating a K-Means clustering model and visualizing its results, demonstrating how Streamlit can front-end complex ML workflows.
+*   **Best Practices**: Using virtual environments, structuring code, and providing user feedback.
+
+### Further Enhancements and Next Steps
+
+This application provides a solid foundation. Here are some ideas for how you can extend it:
+
+1.  **More Data Types**: Add support for Excel (`.xlsx`), JSON, or even database connections.
+2.  **Advanced Preprocessing**:
+    *   One-hot encoding for categorical features.
+    *   Outlier detection and handling.
+    *   Feature engineering (e.g., creating new features from existing ones).
+3.  **Additional Visualizations**:
+    *   Pair plots (`seaborn.pairplot`).
+    *   Correlation matrices (`sns.heatmap`).
+    *   Time-series plots (if applicable to your data).
+    *   Interactive plots using libraries like Plotly or Altair (`st.plotly_chart`, `st.altair_chart`).
+4.  **More ML Models**:
+    *   Implement classification models (e.g., Logistic Regression, Decision Trees) with interactive prediction features.
+    *   Regression models.
+    *   Allow users to select target variables and features for ML.
+5.  **Model Persistence**: Save and load trained ML models using `joblib` or `pickle` to avoid retraining on every run.
+6.  **Error Handling**: Implement more robust error handling (e.g., try-except blocks) for file processing or ML operations.
+7.  **Deployment**: Learn how to deploy your Streamlit application to:
+    *   [Streamlit Cloud](https://streamlit.io/cloud) (the easiest option).
+    *   Heroku or Render.
+    *   Docker and Kubernetes.
+
+You now have a strong understanding of how to leverage Streamlit for creating powerful and engaging data applications. Keep experimenting and building!
